@@ -1,6 +1,15 @@
 # Daisy
 
-Daisy is a "virtual" computer built using hardware simulation software. It started off as a single NAND
-gate but concluded its incredible journey as a 32-bit computer with its own custom built operating system.
+Daisy is a 16-bit computer equipped with a screen and a keyboard. It resembles
+old school handheld computers like Gameboys, PDAs and mobile phones.
 
-My goal for this project is to build a modern computer from first principles.
+This project includes:
+* a hardware platform,
+* an assembler,
+* a virtual machine,
+* a programming language called DaisyScript,
+* the DaisyScript compiler,
+* a mini operating system written in DaisyScript
+
+My goal for this project is to build a modern computer from scratch using first 
+principles.
