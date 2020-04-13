@@ -3,9 +3,11 @@ CHIP PC {
   OUT out[16];
 
   PARTS:
-  Inc16(in=feedback, out=incremented);
-  Mux16(a=in, b=incremented, sel=inc, out=input);
-  Mux16(a=input, b=false, sel=reset, out=registerInput);
-  Mux16(a=load, b=true, sel=reset, out=loadRegister);
-  Register(in=registerInput, load=loadRegister, out=feedback, out=out);
+  Inc16(in=feedback, out=feedbackIncremented);
+
+  Mux16(a=feedback, b=feedbackIncremented, sel=inc, out=w1);
+  Mux16(a=w1, b=in, sel=load, out=w2);
+  Mux16(a=w2, b=false, sel=reset, out=input);
+
+  Register(in=input, load=true, out=feedback, out=out);
 }
