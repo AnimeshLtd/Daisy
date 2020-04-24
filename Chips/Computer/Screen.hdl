@@ -1,0 +1,21 @@
+//  Memory map of the physical screen
+//  
+//  Functions exactly like a 16-bit 8K RAM:
+//    1. out(t) = Screen[address(t)](t)
+//    2. If load(t-1) then Screen[address(t-1)](t) = in(t-1)
+//
+//  Has the side effect of continuously refreshing a 256 by 512 pixels
+//  black-and-white screen. Simulators must simulate this device.
+//  Each row in the physical screen is represented by 32 consecutive
+//  16-bit words, starting at the top left corner of the screen.
+
+CHIP Screen {
+  IN in[16], address[13], load;
+  OUT out[16];
+
+  PARTS:
+  DMux(in=load, sel=address[12], a=loadScreenRam1, b=loadScreenRam2);
+  RAM4K(in=in, load=loadScreenRam1, address=address[0..11], out=outScreenRam1);
+  RAM4K(in=in, load=loadScreenRam2, address=address[0..11], out=outScreenRam2);
+  Mux16(a=outScreenRam1, b=outScreenRam2, sel=address[12], out=out);
+}
