@@ -53,51 +53,35 @@ CHIP CPU {
 
   // RAM write instruction
   And(a=cInstruction, b=instruction[3], out=writeM); // instruction[3] is destination bit for RAM
-  And16(a=A, b=A, out[0..14]=addressM, out[15]=discard1);  // Destination memory address is the value stored in A register
+  And16(a=A, b=A, out[0..14]=addressM);  // Destination memory address is the value stored in A register
 
   //
   //  Jump control logic
   //  Driven by the bits 0..2 in the c-instruction, also called the jump bits
   //
-  // Nand(a=ng, b=zr, out=positive);
+  Or(a=ng, b=zr, out=jumpw1);
+  Not(in=jumpw1, out=positive);
 
-  // And(a=positive, b=instruction[0], out=jgt); // > 0
-  // And(a=zr, b=instruction[1], out=jeq);       // = 0
-  // Or(a=jgt, b=jeq, out=jge);                  // ≥ 0
-  // And(a=ng, b=instruction[2], out=jlt);       // < 0
-  // Or(a=jgt, b=jlt, out=jne);                  // ≠ 0
-  // Or(a=jlt, b=jeq, out=jle);                  // ≤ 0
+  And(a=positive, b=instruction[0], out=jgt); // > 0
+  And(a=zr, b=instruction[1], out=jeq);       // = 0
+  Or(a=jgt, b=jeq, out=jge);                  // ≥ 0
+  And(a=ng, b=instruction[2], out=jlt);       // < 0
+  Or(a=jgt, b=jlt, out=jne);                  // ≠ 0
+  Or(a=jlt, b=jeq, out=jle);                  // ≤ 0
 
-  // Mux8Way16(
-  //   a=false, 
-  //   b[0]=jgt, b[1..15]=false, 
-  //   c[0]=jeq, c[1..15]=false, 
-  //   d[0]=jge, d[1..15]=false, 
-  //   e[0]=jlt, e[1..15]=false, 
-  //   f[0]=jne, f[1..15]=false, 
-  //   g[0]=jle, g[1..15]=false, 
-  //   h=true, 
-  //   sel=instruction[0..2], 
-  //   out[0]=shouldLoadPc, out[1..15]=discard2
-  // );
-  
-  Not(in=zr, out=notZero);
-  Not(in=ng, out=notNegative);
-  And(a=notZero, b=notNegative, out=positive);
+  Mux8Way16(
+    a=false, 
+    b[0]=jgt, 
+    c[0]=jeq, 
+    d[0]=jge,
+    e[0]=jlt,
+    f[0]=jne,
+    g[0]=jle,
+    h=true, 
+    sel=instruction[0..2], 
+    out[0]=jump
+  );
+  And(a=cInstruction, b=jump, out=loadPC);
 
-  Xor(a=positive, b=instruction[0], out=pcw1);
-  Not(in=pcw1, out=positiveCheck);
-  Xor(a=zr, b=instruction[1], out=pcw2);
-  Not(in=pcw2, out=zeroCheck);
-  Xor(a=ng, b=instruction[2], out=pcw3);
-  Not(in=pcw3, out=negativeCheck);
-
-  And(a=positiveCheck, b=zeroCheck, out=pcw4);
-  And(a=pcw4, b=negativeCheck, out=shouldLoadPc1);
-
-  And(a=instruction[0], b=instruction[1], out=pcw5);
-  And(a=pcw5, b=instruction[2], out=shouldLoadPc2);
-  Or(a=shouldLoadPc1, b=shouldLoadPc2, out=shouldLoadPc);
-
-  PC(in=A, load=shouldLoadPc, inc=true, reset=reset, out[0..14]=pc, out[15]=discard3);
+  PC(in=A, load=loadPC, inc=true, reset=reset, out[0..14]=pc);
 }
