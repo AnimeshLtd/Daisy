@@ -1,3 +1,6 @@
+//  My own implementation of the built-in Screen chip. The memory module
+//  does not use this implementation.
+//  
 //  Memory map of the physical screen
 //  
 //  Functions exactly like a 16-bit 8K RAM:
@@ -9,7 +12,7 @@
 //  Each row in the physical screen is represented by 32 consecutive
 //  16-bit words, starting at the top left corner of the screen.
 
-CHIP Screen {
+CHIP ScreenReference {
   IN in[16], address[13], load;
   OUT out[16];
 
